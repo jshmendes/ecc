@@ -1,7 +1,9 @@
 #!/usr/bin/env sage
 
+from numpy import median
 from itertools import groupby
 from sage.all import *
+
 
 
 def factorECM(k,m,verbose):
@@ -52,12 +54,17 @@ def factorECM(k,m,verbose):
 				print "m =", m , " = ", gcd(m,d),"x", m/gcd(m,d)
 				return curvecount
 
+	if(verbose):
+		print "No factor found with the given parameter : try increase B"
 	return curvecount
 
 def main(argv):		
 	if len(sys.argv) != 4:
 	    print("Usage: %s <v|q> <Number> <Smooth Border>  " % sys.argv[0])
 	    print("Naive implementation of ECM for factorization")
+	    print("v : Try to factor <Number> with <Smooth Border>")
+	    print("q : Do some benchmark with random composite and predefine B")
+
 	    sys.exit(1)
 
 	#The number we want to factor
@@ -72,10 +79,10 @@ def main(argv):
 		factorECM(k,m,True)
 		return 0
 	if sys.argv[1] == 'q':
-		for i in range (4,10):
+		Blist = (200,500,1000,1500)
+		for i in range (11,16):
 			rg = 10**i
-			for j in range (1,4):		
-				B = 10**j
+			for B in Blist:		
 				nbcurve = list()
 				k = LCM(2..previous_prime(B))
 				for l in range(10):
@@ -83,7 +90,7 @@ def main(argv):
 					q = next_prime(ZZ.random_element(rg*321,rg*14311))
 					nbcurve.append(factorECM(k,p*q,False))
 				print rg, B,  
-				print float(reduce(lambda x, y: x + y, nbcurve) / len(nbcurve))	
+				print float(sum(nbcurve) / len(nbcurve)), float(median(nbcurve)),
 				print nbcurve
 
 if __name__ == "__main__":

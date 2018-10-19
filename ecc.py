@@ -1,4 +1,6 @@
-
+'''
+Just for fun
+'''
 
 import math
 import sys, getopt
@@ -6,6 +8,12 @@ from fractions import gcd
 from itertools import groupby
 
 
+'''
+Return a list for a Elliptic curve
+with parameter y2 = x**3+a*x+b % mod
+We first compute the list of i such as i^2 = y % mod
+in order to find easily if y^2=f(x) has a solution 
+'''
 
 def listpoint(a,b,mod):
 	res = list()
@@ -22,16 +30,27 @@ def listpoint(a,b,mod):
 				output.append((j, indices[i]))
 	return output
 
+'''
+Provide range for the order of curve 
+using Hasse's theorem
+'''
 def orderC(mod):
 	return (int(mod-2*math.sqrt(float(mod))+1),int(mod+2*math.sqrt(float(mod))+1))
 
+'''
+Basic primality test 
+'''
 def isPrime(n):
     for i in range(2,int(n**0.5)+1):
         if n%i==0:
             return False
     return True
 
-#Stupid version as it will blow the memory
+'''
+We compute the product all prime p**i such as
+i is the max to verify p**i < B 
+=> Stupid version as it will blow the memory if B is too big
+'''
 def supersmoothValue(B):
     Bss = 1
     for i in range(2,B):
@@ -44,14 +63,21 @@ def supersmoothValue(B):
 		Bss = Bss*i**power
     return Bss
 
+
+''' 
+Return 1 if val divide Bss
+'''
 def supersmoothTestV1(val,Bss):
-	if gcd(i,Bss) == i:
+	if gcd(val,Bss) == val:
 		return 1
 	else:
 		return 0
 
-
-#Smarter version 
+'''
+ Smarter version of the above computation
+Instead of computing Bss as the product of all p^i
+We compute it as list of all p^i. 
+'''
 def superSmoothList(B):
     Bss = list()
     for i in range(2,B):
@@ -65,6 +91,12 @@ def superSmoothList(B):
     return Bss
 
 
+'''
+For each p^i, We compute the gcd(p^i, val)
+and return the product of the gcd
+if gcd == val, val divide Bss
+'''
+
 def supersmoothTestV2(val,Bss):
 	res = 1
 	for i in Bss:
@@ -74,6 +106,9 @@ def supersmoothTestV2(val,Bss):
 	else:
 		return 0
 
+'''
+Small function to find Bss-Smooth orders of EC
+'''
 def supersmoothTest((a,b),Bss):
     res = list()
     for i in range (a,b+1):
@@ -83,7 +118,7 @@ def supersmoothTest((a,b),Bss):
 
 #Compute the number of elements for each curve modulo m (m must be prime).
 # and count the number of curve by order.
-#Using my dummy implementation 
+#This dummy implementation is actually faster than using sage for small value of m
 def computeCurveOrder(m):
    	orderL = []
    	count = 0	
@@ -93,20 +128,6 @@ def computeCurveOrder(m):
 				orderL.append(len(listpoint(a,b,m))+1)
 				count+=1
 
-	orderL = sorted(orderL)
-	t = [len(list(group)) for key, group in groupby(orderL)]
-	return t	
-
-
-#Using the power of Sage:
-def s_computeCurveOrder(m):
-   	orderL = []
-	Z = Zmod(m)
-	for a in range (m):
-		for b in range (m):
-			if ((4*a**3+27*b**2)%m > 0):
-				E = EllipticCurve(Z, (a,b))
-				orderL.append(E.cardinality())
 	orderL = sorted(orderL)
 	t = [len(list(group)) for key, group in groupby(orderL)]
 	return t	
