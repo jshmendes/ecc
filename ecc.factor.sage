@@ -5,7 +5,10 @@ from itertools import groupby
 from sage.all import *
 
 
-
+'''
+Naive implemenation of ECM method
+for test and education purposes
+'''
 def factorECM(k,m,verbose):
 	condition1 = True
 	condition2 = True
